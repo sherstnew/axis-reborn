@@ -1,0 +1,125 @@
+.location {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+.map_wrapper {
+  width: 100%;
+  height: 500px;
+  border-radius: 15px;
+}
+
+.map {
+  width: 100%;
+  height: 100%;
+}
+
+.points {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.point {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  max-width: 200px;
+}
+
+.points_header {
+  font-size: 24px;
+  width: 100%;
+}
+
+.btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  width: 100%;
+}
+
+.inputs {
+  width: 40%;
+  display: flex;
+  align-items: flex-start;
+  align-content: flex-start;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.inputs_header {
+  width: 100%;
+  font-size: 24px;
+  padding: 10px;
+}
+
+.inputs_subheader {
+  width: 100%;
+  font-size: 20px;
+  padding: 10px;
+}
+
+.block {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.balloon {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px;
+}
+
+.input {
+  width: 100%;
+  font-family: inherit;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  padding: 10px;
+}
+
+.balloon_header {
+  font-size: 18px;
+}
+
+.balloon_btn {
+  font-family: inherit;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.streets {
+  width: 40%;
+  display: flex;
+  align-items: flex-start;
+  align-content: flex-start;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.charts {
+  background-color: #fff;
+  padding: 20px;
+  width: 100%;
+  border-radius: 10px;
+}
+
+.charts_header {
+  color: #000000;
+}
+
+label {
+  width: 100%;
+  font-size: 16px !important;
+}
