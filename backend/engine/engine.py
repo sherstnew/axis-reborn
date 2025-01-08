@@ -22,6 +22,11 @@ first_quartal_length = 91
 
 mcd_middle_passengerflow = 8064
 
+# people
+apartment_ppl = 33
+flats_ppl = 18
+office_ppl = 4.5
+
 # CONSTANTS
 
 # all_traffic = 50000
@@ -54,9 +59,9 @@ def calc_all_people(construction_area: ConstructionAreas):
     new_living_people = 0
     new_working_people = 0
 
-    new_living_people += construction_area.apartments / 25
-    new_living_people += construction_area.block_of_flats / 45
-    new_working_people += construction_area.no_living_square / 35
+    new_living_people += construction_area.apartments / apartment_ppl
+    new_living_people += construction_area.block_of_flats / flats_ppl
+    new_working_people += construction_area.no_living_square / office_ppl
     return new_living_people + new_working_people
 
 
