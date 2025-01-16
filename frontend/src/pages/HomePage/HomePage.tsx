@@ -52,6 +52,8 @@ export const HomePage = () => {
   const [stationsAmount, setStationsAmount] = useState<number>(0);
   const [stopsAmount, setStopsAmount] = useState<number>(0);
 
+  const [loading, setLoading] = useState<boolean>(false);
+
   function init() {
     const myMap = new ymaps.Map(
       "map",
@@ -252,8 +254,10 @@ export const HomePage = () => {
         data.people = people;
       }
 
+      setLoading(true);
+      
       fetch(
-        `http://127.0.0.1:8000/calc/${
+        `${import.meta.env.VITE_PUBLIC_BACKEND_URL}/calc/${
           squareMode ? "square" : "people"
         }?stations_amount=${stationsAmount}&stops_amount=${stopsAmount}`,
         {
@@ -264,9 +268,32 @@ export const HomePage = () => {
           body: JSON.stringify(data),
         }
       )
-        .then((data) => data.json())
-        .then((res) => {
-          setResults(res);
+      .then((data) => data.json())
+      .then((res: Result) => {
+        setResults(res);
+        if (map) {
+          res.stations.forEach((station) => {
+              const placemark = new ymaps.Placemark([station.latitude, station.longtitude], {
+                balloonContentBody: renderToString(
+                  <div className={styles.balloon}>{station.name}</div>
+                ),
+                hintContent: station.name,
+              });
+              map.geoObjects.add(placemark);
+            });
+            
+            res.stops.forEach((stop) => {
+              const placemark = new ymaps.Placemark([stop.latitude, stop.longtitude], {
+                balloonContentBody: renderToString(
+                  <div className={styles.balloon}>{stop.name}</div>
+                ),
+                hintContent: stop.name,
+              });
+              map.geoObjects.add(placemark);
+              
+            });
+          }
+          setLoading(false);
         })
         .catch((err) => {
           console.log(err);
@@ -394,7 +421,13 @@ export const HomePage = () => {
         )}
         <Button size="xl" onClick={calculateData}>
           <Icon data={MathOperations} size={20} />
-          Рассчитать данные
+          {
+            loading
+            ?
+            'Рассчитываем...'
+            :
+            'Рассчитать данные'
+          }
         </Button>
       </div>
       {results ? (
@@ -411,7 +444,7 @@ export const HomePage = () => {
                         Пассажиропоток ~{station.new_traffic} чел.
                       </div>
                       <label style={{ paddingLeft: 30 }}>
-                        Увеличение на {station.traffic} человек
+                        Увеличение на {station.delta_traffic} человек
                       </label>
                       <label style={{ paddingLeft: 30 }}>
                         Увеличение на {station.delta_percent}%
@@ -443,7 +476,7 @@ export const HomePage = () => {
             <h2 className={styles.charts_header}>
               Увеличение пассажиропотока на станциях, чел.
             </h2>
-            <PieChart
+            {/* <PieChart
               series={[
                 {
                   data: results.stations.map((station, index) => ({
@@ -454,7 +487,7 @@ export const HomePage = () => {
                 },
               ]}
               height={300}
-            />
+            /> */}
             <BarChart
               dataset={results.stations}
               xAxis={[{ scaleType: "band", dataKey: "name" }]}
@@ -464,7 +497,7 @@ export const HomePage = () => {
             <h2 className={styles.charts_header}>
               Увеличение пассажиропотока на остановках, чел.
             </h2>
-            <PieChart
+            {/* <PieChart
               series={[
                 {
                   data: results.stops.map((stop, index) => ({
@@ -475,11 +508,11 @@ export const HomePage = () => {
                 },
               ]}
               height={300}
-            />
+            /> */}
             <BarChart
               dataset={results.stops}
               xAxis={[{ scaleType: "band", dataKey: "name" }]}
-              series={[{ dataKey: "delta_traffic", label: "Новый траффик, чел." }]}
+              series={[{ dataKey: "traffic", label: "Новый траффик, чел." }]}
               height={500}
             />
             <h2 className={styles.charts_header}>

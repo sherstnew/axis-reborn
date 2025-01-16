@@ -8,10 +8,14 @@ class OutputStation(BaseModel):
     delta_percent: int
     previous_traffic: int
     new_traffic: int
+    latitude: float
+    longtitude: float
 
 class OutputStop(BaseModel):
     name: str
     traffic: int
+    latitude: float
+    longtitude: float
 
 class InputDataSquare(BaseModel):
     center: Tuple[float, float]
