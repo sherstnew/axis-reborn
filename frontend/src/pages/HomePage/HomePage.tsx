@@ -49,7 +49,6 @@ export const HomePage = () => {
 
   const [people, setPeople] = useState<number>(0);
 
-  const [stationsAmount, setStationsAmount] = useState<number>(0);
   const [stopsAmount, setStopsAmount] = useState<number>(0);
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -233,7 +232,6 @@ export const HomePage = () => {
       !isNaN(apartments) &&
       !isNaN(blocks) &&
       !isNaN(noLiving) &&
-      stationsAmount > 0 &&
       stopsAmount > 0 &&
       polygons.length > 0 &&
       (people > 0 || (apartments > 0 && blocks > 0 && noLiving > 0))
@@ -255,11 +253,12 @@ export const HomePage = () => {
       }
 
       setLoading(true);
+      setResults(undefined);
       
       fetch(
         `${import.meta.env.VITE_PUBLIC_BACKEND_URL}/calc/${
           squareMode ? "square" : "people"
-        }?stations_amount=${stationsAmount}&stops_amount=${stopsAmount}`,
+        }?stations_amount=${10}&stops_amount=${stopsAmount}`,
         {
           method: "POST",
           headers: {
@@ -355,13 +354,6 @@ export const HomePage = () => {
       </div>
       <div className={styles.inputs}>
         <div className={styles.inputs_header}>Данные на ввод</div>
-        <TextInput
-          onUpdate={(value) => setStationsAmount(Number(value))}
-          defaultValue="0"
-          label="Кол-во станций"
-          type="number"
-          size="l"
-        />{" "}
         <TextInput
           onUpdate={(value) => setStopsAmount(Number(value))}
           defaultValue="0"

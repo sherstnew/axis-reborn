@@ -70,7 +70,6 @@ def get_nearest_metro_stations(latitude, longtitude, amount):
     stations_response = requests.get(
         f"https://geocode-maps.yandex.ru/1.x/?apikey={os.getenv('YANDEX_API_KEY')}&geocode={str(longtitude)}, {str(latitude)}&format=json&kind=metro&results={str(amount)}"
     ).json()
-
     stations = []
 
     for station in stations_response["response"]["GeoObjectCollection"][
@@ -103,7 +102,7 @@ def get_nearest_bus_stops(latitude, longtitude, amount):
 
     sorted_stops = sorted(all_stops, key=lambda stop: stop["distance"])
 
-    return sorted_stops[:amount]
+    return sorted_stops[:amount - 1]
 
 
 def calc_stations_stops_traffic(all_traffic, center, stations, stops):
@@ -125,7 +124,15 @@ def calc_stations_stops_traffic(all_traffic, center, stations, stops):
     stations_traffic = percent_metro_mcd * all_traffic
     stops_traffic = percent_bus * all_traffic
     
-    print(stations_traffic)
+    unique_stations = []
+    used_stations_names = []
+    
+    for station in stations:
+        if station["name"] not in used_stations_names:
+            unique_stations.append(station)
+            used_stations_names.append(station["name"])
+            
+    stations = unique_stations
 
     for i in range(len(stations)):
         station = stations[i]
@@ -136,22 +143,23 @@ def calc_stations_stops_traffic(all_traffic, center, stations, stops):
         )
 
         passengerflow = get_station_passengerflow(station["name"])
-        if passengerflow != -1:
+        if passengerflow != -1 and passengerflow != 0:
             new_station["delta_percent"] = (
                 round((passengerflow + new_station["delta_traffic"]) * 100 / passengerflow)
                 - 100
             )
             new_station["previous_traffic"] = passengerflow
             new_station["new_traffic"] = passengerflow + new_station["delta_traffic"]
+            
+            new_station["latitude"] = station["latitude"]
+            new_station["longtitude"] = station["longtitude"]
+
+            new_stations.append(new_station)
         else:
             new_station["delta_percent"] = 0
             new_station["previous_traffic"] = 0
             new_station["delta_traffic"] = 0
             
-        new_station["latitude"] = station["latitude"]
-        new_station["longtitude"] = station["longtitude"]
-
-        new_stations.append(new_station)
 
     for i in range(len(stops)):
         stop = stops[i]
