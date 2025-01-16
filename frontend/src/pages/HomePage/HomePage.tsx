@@ -254,7 +254,7 @@ export const HomePage = () => {
 
       setLoading(true);
       setResults(undefined);
-      
+
       fetch(
         `${import.meta.env.VITE_PUBLIC_BACKEND_URL}/calc/${
           squareMode ? "square" : "people"
@@ -267,29 +267,98 @@ export const HomePage = () => {
           body: JSON.stringify(data),
         }
       )
-      .then((data) => data.json())
-      .then((res: Result) => {
-        setResults(res);
-        if (map) {
-          res.stations.forEach((station) => {
-              const placemark = new ymaps.Placemark([station.latitude, station.longtitude], {
-                balloonContentBody: renderToString(
-                  <div className={styles.balloon}>{station.name}</div>
-                ),
-                hintContent: station.name,
-              });
+        .then((data) => data.json())
+        .then((res: Result) => {
+          setResults(res);
+          if (map) {
+            res.stations.forEach((station) => {
+              let color = "black";
+              if (station.delta_percent >= 50) {
+                color = "red";
+              } else if (
+                station.delta_percent < 50 &&
+                station.delta_percent >= 25
+              ) {
+                color = "orange";
+              } else if (
+                station.delta_percent < 25 &&
+                station.delta_percent >= 15
+              ) {
+                color = "yellow";
+              } else if (
+                station.delta_percent < 15 &&
+                station.delta_percent >= 0
+              ) {
+                color = "green";
+              }
+              const placemark = new ymaps.Placemark(
+                [station.latitude, station.longtitude],
+                {
+                  balloonContentBody: renderToString(
+                    <div
+                      className={styles.balloon}
+                      style={{ display: "flex", flexWrap: "wrap" }}
+                    >
+                      <div style={{ width: "100%" }}>Станция {station.name}</div>
+                      <div style={{ width: "100%" }}>
+                        Было {station.previous_traffic} чел.
+                      </div>
+                      <div style={{ width: "100%" }}>
+                        На {station.delta_percent}%
+                      </div>
+                      <div style={{ width: "100%" }}>
+                        На {station.delta_traffic} чел.
+                      </div>
+                      <div style={{ width: "100%" }}>
+                        Стало {station.new_traffic} чел.
+                      </div>
+                    </div>
+                  ),
+                  hintContent: station.name,
+                },
+                {
+                  iconColor: color,
+                }
+              );
               map.geoObjects.add(placemark);
             });
-            
+
             res.stops.forEach((stop) => {
-              const placemark = new ymaps.Placemark([stop.latitude, stop.longtitude], {
-                balloonContentBody: renderToString(
-                  <div className={styles.balloon}>{stop.name}</div>
-                ),
-                hintContent: stop.name,
-              });
+              let color = "black";
+              if (stop.traffic >= 500) {
+                color = "red";
+              } else if (
+                stop.traffic < 500 &&
+                stop.traffic >= 350
+              ) {
+                color = "orange";
+              } else if (
+                stop.traffic < 350 &&
+                stop.traffic >= 200
+              ) {
+                color = "yellow";
+              } else if (
+                stop.traffic < 200 &&
+                stop.traffic >= 0
+              ) {
+                color = "green";
+              }
+              const placemark = new ymaps.Placemark(
+                [stop.latitude, stop.longtitude],
+                {
+                  balloonContentBody: renderToString(
+                    <div className={styles.balloon} style={{ display: "flex", flexWrap: "wrap" }}>
+                      <div style={{width: '100%'}}>Остановка {stop.name}</div>
+                      <div style={{width: '100%'}}>Увеличение на {stop.traffic} чел.</div>
+                    </div>
+                  ),
+                  hintContent: stop.name,
+                },
+                {
+                  iconColor: color
+                }
+              );
               map.geoObjects.add(placemark);
-              
             });
           }
           setLoading(false);
@@ -413,13 +482,7 @@ export const HomePage = () => {
         )}
         <Button size="xl" onClick={calculateData}>
           <Icon data={MathOperations} size={20} />
-          {
-            loading
-            ?
-            'Рассчитываем...'
-            :
-            'Рассчитать данные'
-          }
+          {loading ? "Рассчитываем..." : "Рассчитать данные"}
         </Button>
       </div>
       {results ? (
@@ -483,7 +546,9 @@ export const HomePage = () => {
             <BarChart
               dataset={results.stations}
               xAxis={[{ scaleType: "band", dataKey: "name" }]}
-              series={[{ dataKey: "delta_traffic", label: "Новый траффик, чел." }]}
+              series={[
+                { dataKey: "delta_traffic", label: "Новый траффик, чел." },
+              ]}
               height={500}
             />
             <h2 className={styles.charts_header}>
