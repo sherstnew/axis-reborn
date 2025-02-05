@@ -18,10 +18,12 @@ class OutputStop(BaseModel):
     longtitude: float
 
 class InputDataSquare(BaseModel):
+    points: List[Tuple[float, float]]
     center: Tuple[float, float]
     construction_area: ConstructionAreas
     
 class InputDataPeople(BaseModel):
+    points: List[Tuple[float, float]]
     center: Tuple[float, float]
     people: int
     

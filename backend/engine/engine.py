@@ -30,6 +30,20 @@ office_ppl = 4.5
 # CONSTANTS
 
 
+def calculate_area(points) -> float:
+    """
+    Вычисление площади ЖК по формуле Гаусса
+    """
+    area = 0.0
+    n = len(points)
+    for i in range(n):
+        j = (i + 1) % n
+        area += points[i][0] * points[j][1]
+        area -= points[j][0] * points[i][1]
+    area = abs(area) / 2.0
+    return area
+
+
 def calc_all_people(construction_area: ConstructionAreas):
     new_living_people = 0
     new_working_people = 0
@@ -66,9 +80,9 @@ def geo_data_to_coords(geoData):
     return (latitude, longtitude)
 
 
-def get_nearest_metro_stations(latitude, longtitude, amount):
+def get_nearest_metro_stations(latitude, longtitude):
     stations_response = requests.get(
-        f"https://geocode-maps.yandex.ru/1.x/?apikey={os.getenv('YANDEX_API_KEY')}&geocode={str(longtitude)}, {str(latitude)}&format=json&kind=metro&results={str(amount)}"
+        f"https://geocode-maps.yandex.ru/1.x/?apikey={os.getenv('YANDEX_API_KEY')}&geocode={str(longtitude)}, {str(latitude)}&format=json&kind=metro"
     ).json()
     stations = []
 
@@ -97,12 +111,19 @@ def get_nearest_bus_stops(latitude, longtitude, amount):
             distance = geopy.distance.geodesic(
                 (latitude, longtitude), geo_data_to_coords(stop["geoData"])
             ).m
-            all_stops.append({"name": stop["stop_name"], "distance": distance, "latitude": geo_data_to_coords(stop["geoData"])[0], "longtitude": geo_data_to_coords(stop["geoData"])[1]})
+            all_stops.append(
+                {
+                    "name": stop["stop_name"],
+                    "distance": distance,
+                    "latitude": geo_data_to_coords(stop["geoData"])[0],
+                    "longtitude": geo_data_to_coords(stop["geoData"])[1],
+                }
+            )
             used_stops_names.append(stop["stop_name"])
 
     sorted_stops = sorted(all_stops, key=lambda stop: stop["distance"])
 
-    return sorted_stops[:amount - 1]
+    return sorted_stops[: amount - 1]
 
 
 def calc_stations_stops_traffic(all_traffic, center, stations, stops):
@@ -113,7 +134,9 @@ def calc_stations_stops_traffic(all_traffic, center, stations, stops):
 
     for station in stations:
         stations_km.append(
-            geopy.distance.geodesic(center, (station["latitude"], station["longtitude"])).km
+            geopy.distance.geodesic(
+                center, (station["latitude"], station["longtitude"])
+            ).km
         )
 
     for stop in stops:
@@ -123,15 +146,15 @@ def calc_stations_stops_traffic(all_traffic, center, stations, stops):
 
     stations_traffic = percent_metro_mcd * all_traffic
     stops_traffic = percent_bus * all_traffic
-    
+
     unique_stations = []
     used_stations_names = []
-    
+
     for station in stations:
         if station["name"] not in used_stations_names:
             unique_stations.append(station)
             used_stations_names.append(station["name"])
-            
+
     stations = unique_stations
 
     for i in range(len(stations)):
@@ -139,18 +162,21 @@ def calc_stations_stops_traffic(all_traffic, center, stations, stops):
         new_station = {}
         new_station["name"] = station["name"]
         new_station["delta_traffic"] = round(
-            (stations_km[len(stations_km) - 1 - i] / sum(stations_km)) * stations_traffic
+            (stations_km[len(stations_km) - 1 - i] / sum(stations_km))
+            * stations_traffic
         )
 
         passengerflow = get_station_passengerflow(station["name"])
         if passengerflow != -1 and passengerflow != 0:
             new_station["delta_percent"] = (
-                round((passengerflow + new_station["delta_traffic"]) * 100 / passengerflow)
+                round(
+                    (passengerflow + new_station["delta_traffic"]) * 100 / passengerflow
+                )
                 - 100
             )
             new_station["previous_traffic"] = passengerflow
             new_station["new_traffic"] = passengerflow + new_station["delta_traffic"]
-            
+
             new_station["latitude"] = station["latitude"]
             new_station["longtitude"] = station["longtitude"]
 
@@ -159,13 +185,14 @@ def calc_stations_stops_traffic(all_traffic, center, stations, stops):
             new_station["delta_percent"] = 0
             new_station["previous_traffic"] = 0
             new_station["delta_traffic"] = 0
-            
 
     for i in range(len(stops)):
         stop = stops[i]
         new_stop = {}
         new_stop["name"] = stop["name"]
-        new_stop["traffic"] = round((stops_km[len(stops_km) - 1 - i] / sum(stops_km)) * stops_traffic)
+        new_stop["traffic"] = round(
+            (stops_km[len(stops_km) - 1 - i] / sum(stops_km)) * stops_traffic
+        )
         new_stop["latitude"] = stop["latitude"]
         new_stop["longtitude"] = stop["longtitude"]
 

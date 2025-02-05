@@ -49,8 +49,6 @@ export const HomePage = () => {
 
   const [people, setPeople] = useState<number>(0);
 
-  const [stopsAmount, setStopsAmount] = useState<number>(0);
-
   const [loading, setLoading] = useState<boolean>(false);
 
   function init() {
@@ -232,7 +230,6 @@ export const HomePage = () => {
       !isNaN(apartments) &&
       !isNaN(blocks) &&
       !isNaN(noLiving) &&
-      stopsAmount > 0 &&
       polygons.length > 0 &&
       (people > 0 || (apartments > 0 && blocks > 0 && noLiving > 0))
     ) {
@@ -248,8 +245,10 @@ export const HomePage = () => {
           apartments: apartments,
           block_of_flats: blocks,
         };
+        data.points = polygons[currentPolygon].points;
       } else {
         data.people = people;
+        data.points = polygons[currentPolygon].points;
       }
 
       setLoading(true);
@@ -258,7 +257,7 @@ export const HomePage = () => {
       fetch(
         `${import.meta.env.VITE_PUBLIC_BACKEND_URL}/calc/${
           squareMode ? "square" : "people"
-        }?stations_amount=${10}&stops_amount=${stopsAmount}`,
+        }`,
         {
           method: "POST",
           headers: {
@@ -299,7 +298,9 @@ export const HomePage = () => {
                       className={styles.balloon}
                       style={{ display: "flex", flexWrap: "wrap" }}
                     >
-                      <div style={{ width: "100%" }}>Станция {station.name}</div>
+                      <div style={{ width: "100%" }}>
+                        Станция {station.name}
+                      </div>
                       <div style={{ width: "100%" }}>
                         Было {station.previous_traffic} чел.
                       </div>
@@ -317,6 +318,7 @@ export const HomePage = () => {
                   hintContent: station.name,
                 },
                 {
+                  preset: "islands#circleDotIcon",
                   iconColor: color,
                 }
               );
@@ -327,35 +329,32 @@ export const HomePage = () => {
               let color = "black";
               if (stop.traffic >= 500) {
                 color = "red";
-              } else if (
-                stop.traffic < 500 &&
-                stop.traffic >= 350
-              ) {
+              } else if (stop.traffic < 500 && stop.traffic >= 350) {
                 color = "orange";
-              } else if (
-                stop.traffic < 350 &&
-                stop.traffic >= 200
-              ) {
+              } else if (stop.traffic < 350 && stop.traffic >= 200) {
                 color = "yellow";
-              } else if (
-                stop.traffic < 200 &&
-                stop.traffic >= 0
-              ) {
+              } else if (stop.traffic < 200 && stop.traffic >= 0) {
                 color = "green";
               }
               const placemark = new ymaps.Placemark(
                 [stop.latitude, stop.longtitude],
                 {
                   balloonContentBody: renderToString(
-                    <div className={styles.balloon} style={{ display: "flex", flexWrap: "wrap" }}>
-                      <div style={{width: '100%'}}>Остановка {stop.name}</div>
-                      <div style={{width: '100%'}}>Увеличение на {stop.traffic} чел.</div>
+                    <div
+                      className={styles.balloon}
+                      style={{ display: "flex", flexWrap: "wrap" }}
+                    >
+                      <div style={{ width: "100%" }}>Остановка {stop.name}</div>
+                      <div style={{ width: "100%" }}>
+                        Увеличение на {stop.traffic} чел.
+                      </div>
                     </div>
                   ),
                   hintContent: stop.name,
                 },
                 {
-                  iconColor: color
+                  preset: "islands#circleIcon",
+                  iconColor: color,
                 }
               );
               map.geoObjects.add(placemark);
@@ -423,13 +422,6 @@ export const HomePage = () => {
       </div>
       <div className={styles.inputs}>
         <div className={styles.inputs_header}>Данные на ввод</div>
-        <TextInput
-          onUpdate={(value) => setStopsAmount(Number(value))}
-          defaultValue="0"
-          label="Кол-во остановок"
-          type="number"
-          size="l"
-        />
         <Switch
           content="По площади"
           onUpdate={(checked) => setSquareMode(checked)}
@@ -577,6 +569,18 @@ export const HomePage = () => {
             </h2>
             <h2 className={styles.charts_header}>До:</h2>
             <PieChart
+              colors={[
+                "ff0000",
+                "ff8700",
+                "ffd300",
+                "deff0a",
+                "a1ff0a",
+                "0aff99",
+                "0aefff",
+                "147df5",
+                "580aff",
+                "be0aff",
+              ]}
               series={[
                 {
                   data: results.stations.map((station, index) => ({
@@ -590,6 +594,18 @@ export const HomePage = () => {
             />
             <h2 className={styles.charts_header}>После:</h2>
             <PieChart
+              colors={[
+                "ff0000",
+                "ff8700",
+                "ffd300",
+                "deff0a",
+                "a1ff0a",
+                "0aff99",
+                "0aefff",
+                "147df5",
+                "580aff",
+                "be0aff",
+              ]}
               series={[
                 {
                   data: results.stations.map((station, index) => ({

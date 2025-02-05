@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import List, Tuple
 
 class ConstructionAreas(BaseModel):
         no_living_square: float
