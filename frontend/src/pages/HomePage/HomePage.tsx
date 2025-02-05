@@ -570,16 +570,16 @@ export const HomePage = () => {
             <h2 className={styles.charts_header}>До:</h2>
             <PieChart
               colors={[
-                "ff0000",
-                "ff8700",
-                "ffd300",
-                "deff0a",
-                "a1ff0a",
-                "0aff99",
-                "0aefff",
-                "147df5",
-                "580aff",
-                "be0aff",
+                "#ff0000",
+                "#ff8700",
+                "#ffd300",
+                "#deff0a",
+                "#a1ff0a",
+                "#0aff99",
+                "#0aefff",
+                "#147df5",
+                "#580aff",
+                "#be0aff",
               ]}
               series={[
                 {
@@ -595,16 +595,16 @@ export const HomePage = () => {
             <h2 className={styles.charts_header}>После:</h2>
             <PieChart
               colors={[
-                "ff0000",
-                "ff8700",
-                "ffd300",
-                "deff0a",
-                "a1ff0a",
-                "0aff99",
-                "0aefff",
-                "147df5",
-                "580aff",
-                "be0aff",
+                "#ff0000",
+                "#ff8700",
+                "#ffd300",
+                "#deff0a",
+                "#a1ff0a",
+                "#0aff99",
+                "#0aefff",
+                "#147df5",
+                "#580aff",
+                "#be0aff",
               ]}
               series={[
                 {
