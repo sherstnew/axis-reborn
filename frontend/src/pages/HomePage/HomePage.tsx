@@ -43,8 +43,6 @@ export const HomePage = () => {
   const [blocks, setBlocks] = useState(0);
   const [noLiving, setNoLiving] = useState(0);
 
-  const [, setNewName] = useState("");
-
   const [squareMode, setSquareMode] = useState<boolean>(false);
 
   const [people, setPeople] = useState<number>(0);
@@ -64,33 +62,33 @@ export const HomePage = () => {
       }
     );
 
-    myMap.events.add(["dblclick"], function (event: any) {
-      const placemark = new ymaps.Placemark(event.get("coords"), {
-        balloonContentBody: renderToString(
-          <div className={styles.balloon}>
-            <select defaultValue="station" id="select">
-              <option value="station">Станция</option>
-            </select>
-            <header className={styles.balloon_header}>Создать объект</header>
-            <input
-              type="text"
-              placeholder="Название"
-              className={styles.input}
-              defaultValue={""}
-              onChange={(evt) => setNewName(evt.target.value)}
-              id="name"
-            />
-          </div>
-        ),
-        hintContent: "Создать улицу",
-      });
+  //   myMap.events.add(["dblclick"], function (event: any) {
+  //     const placemark = new ymaps.Placemark(event.get("coords"), {
+  //       balloonContentBody: renderToString(
+  //         <div className={styles.balloon}>
+  //           <select defaultValue="station" id="select">
+  //             <option value="station">Станция</option>
+  //           </select>
+  //           <header className={styles.balloon_header}>Создать объект</header>
+  //           <input
+  //             type="text"
+  //             placeholder="Название"
+  //             className={styles.input}
+  //             defaultValue={""}
+  //             onChange={(evt) => setNewName(evt.target.value)}
+  //             id="name"
+  //           />
+  //         </div>
+  //       ),
+  //       hintContent: "Создать улицу",
+  //     });
 
-      myMap.geoObjects.add(placemark);
-      placemark.balloon.open();
-      placemark.events.add(["balloonclose"], function () {
-        myMap.geoObjects.remove(placemark);
-      });
-    });
+  //     myMap.geoObjects.add(placemark);
+  //     placemark.balloon.open();
+  //     placemark.events.add(["balloonclose"], function () {
+  //       myMap.geoObjects.remove(placemark);
+  //     });
+  //   });
     setMap(myMap);
   }
 
